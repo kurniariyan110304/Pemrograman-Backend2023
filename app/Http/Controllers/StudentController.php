@@ -16,16 +16,54 @@ class StudentController extends Controller
             "data" => $students
         ];
 
+        //jika data kosong maka kirim status code 204
+        if($students->isEmpty()){
+            $data = [
+                "message" => "Resource is empty"
+            ];
+
+            return response()->json($data, 204);
+        }
+
         //kirim data dan responce code
         return response()->json($data, 200);
     }
 
+    public function show($id){
+        $student = Student::find($id);
+
+        //jika data yang dicari tidak ada, kirim kode 404
+        if(!$student){
+            $data = [
+                "message" => "Data not found"
+            ];
+
+            return response()->json($data, 404);
+        }
+
+        $data = [
+            "message" => "Show detail resource",
+            "data" => $student
+        ];
+
+        //mengembalikan data dan status code 200
+        return response()->json($data,200);
+    }
+
     public function store (Request $request) {
+        //validasi data request
+        $request->validate([
+            'nama' =>"required",
+            'nim' => "required",
+            'email' => "required|email",
+            'jurusan' =>"required",
+        ]);
+
         $input = [
-            'nama' => $request->nama,
-            'nim' => $request->nim,
-            'email' => $request->email,
-            'jurusan' => $request->jurusan
+            "nama" => $request->nama,
+            "nim" => $request->nim,
+            "email" => $request->email,
+            "jurusan" => $request->jurusan,
         ];
 
         $students = Student::create($input);
@@ -40,7 +78,31 @@ class StudentController extends Controller
 
     public function update($id, Request $request) {
         $student = Student::find($id);
-    
+
+
+        //jika data yang dicari tidak ada, kirim kode 404
+        if(!$student){
+            $data = [
+                "message" => "Data not found"
+            ];
+
+            return response()->json($data, 404);
+        }
+
+        $student->update([
+            'nama' => $request->nama ?? $student->nama,
+            'nim' => $request->nim ?? $student->nim,
+            'email' => $request->email ?? $student->email,
+            'jurusan' => $request->jurusan ?? $student->jurusan,
+        ]);
+        $data = [
+            'message' => 'Student is updated',
+            'data' => $student
+
+        ];
+        //mengembalikan data (json) dan kode 200
+        return response()->json($data, 200);
+
         if (!$student) {
             return response()->json(['error' => "Siswa dengan ID $id tidak ditemukan"], 404);
         }
