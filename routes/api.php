@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AnimalController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+//Membuat endpoint students dan menambahkan authentication sanctum
+Route::get('/students', [StudentController::class, 'index'])->middleware('auth:scantum');
 //Route untuk menampilkan data semua hewan
 Route::get('/animals', [AnimalController::class, "index"]);
 
@@ -45,3 +49,7 @@ Route::delete('students/{id}', [StudentController::class,"destroy"]);
 
 //Route untuk mendapatkan detail student
 Route::get("students/{id}", [StudentController::class, "show"] );
+
+//Route untuk Register dan Login
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
